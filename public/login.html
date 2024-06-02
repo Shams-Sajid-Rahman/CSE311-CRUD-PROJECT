@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <style>
+      * {
+          margin: center;
+          padding: 0;
+          box-sizing: line;
+      }
+
+      body {
+          margin: center;
+          min-height: 100vh;
+          background: #f4f4f4;
+          display: flex;
+          font-family: arial, sans-serif;
+      }
+
+      .container {
+
+          margin: auto;
+          padding: 20px;
+          width: 400px;
+          max-width: 100%;
+      }
+
+      .container form {
+          width: 100%;
+          height: 100%;
+          padding: 20px;
+          background: white;
+          border-radius: 4px;
+          box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, , 0, 1);
+      }
+
+      .container form h1 {
+          text-align: center;
+          margin-bottom: 24px;
+          color: #222;
+      }
+
+      .container form .form-control {
+          width: 380px;
+          height: 40px;
+          background: white;
+          border-radius: 4px;
+          border: 3px solid silver;
+          margin: 10px 0 10px;
+          padding: 0 10px;
+      }
+
+      .container form .btn {
+          margin-left: 50%;
+          transform: translate(-50%);
+          width: 400px;
+          height: 40px;
+          border: 1px;
+          outline: none;
+          background: #4caf50;
+          cursor: pointer;
+          font-size: 16px;
+          text-transform: uppercase;
+          color: white;
+          border-radius: 3px;
+      }
+
+      .container form .hrf {
+          margin-top: 5%;
+          margin-left: 59%;
+          transform: translate(-50%);
+
+      }
+
+      .container form .hrf1 {
+          margin-left: 40%;
+          transform: translate(-25%);
+
+      }
+
+      .container form .btn:hover{
+    background-color: white;
+    border: 2px solid red;
+    color: black;
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+    }
+
+  </style>
+    
+  </head>
+  <body>
+    <div class="container">
+      <form
+        id="loginForm"
+        
+      >
+        <h1>Login Form</h1>
+        <div class="form_group">
+          <label>Email:</label>
+          <input type="email" class="form-control" name="email" placeholder="example@gmail.com" required >
+        </div>
+        
+        <div class="form_group">
+          <label>Password:</label>
+          <input type="password" class="form-control" name="password" required >
+        </div>
+        
+
+        <div style="margin: 10px 0; display: flex; align-items: center;">
+          <input type="checkbox" value="rememberme" style="width: 13px;"/>
+          <label for="rememberme">Remember Me</label>
+        </div>
+        <button type="submit" class="btn" value="Login">
+          Login
+        </button>
+      <div class="hrf" >
+        <a href="#">Forgot Password?</a>
+      </div>
+      <div class="hrf1">
+        <p>Don't have an account?<a href="./register.html">Register</a></p>
+      </div>
+      </form>
+    </div>
+
+
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          const response = await fetch("http://localhost:3000/api/login", {
+            method: "POST",
+            body: JSON.stringify(Object.fromEntries(formData)),
+            headers: { "Content-Type": "application/json" },
+          });
+          const result = await response.json();
+          if (result.token) {
+            localStorage.setItem("token", result.token);
+            window.location.href = "profile.html";
+          } else {
+            alert("Error: " + result.message);
+          }
+        });
+    </script>
+
+  </body>
+</html>

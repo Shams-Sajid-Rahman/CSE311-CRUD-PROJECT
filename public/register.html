@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        min-height: 100vh;
+        background: #f4f4f4;
+        display: flex;
+        font-family: Arial,sans-serif;
+    }
+
+    .container {
+        margin: 50px auto;
+        padding: 20px;
+        width: 400px;
+        max-width: 100%;
+    }
+
+    .container form {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        background: white;
+        border-radius: 4px;
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, ,0,1);
+    }
+
+    .container form h1 {
+        text-align: center;
+        margin-bottom: 24px;
+        color: #222;
+    }
+
+    .container form .form-control {
+        width: 100%;
+        height: 30px;
+        background: white;
+        border-radius: 4px;
+        border: 3px solid silver;
+        margin: 10px 0 10px;
+        padding: 0 10px;
+    }
+
+    .container form .btn {
+        margin-top: 5%;
+        margin-left: 50%;
+        transform: translate(-50%);
+        width: 320px;
+        height: 40px;
+        border: none;
+        outline: none;
+        background: #4caf50;
+        cursor: pointer;
+        font-size: 16px;
+        text-transform: uppercase;
+        color: white;
+        border-radius: 3px;
+    }
+
+    .container form .hrf {
+        margin-left: 20%;
+        transform: translate(-0%);
+
+    }
+
+    .container form .btn:hover{
+    background-color: white;
+    border: 2px solid red;
+    color: black;
+    transition: 0.3s ease-in-out;
+    cursor: pointer;
+    }
+
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <form id="registerForm" >
+      <h1>Registration Form</h1>
+      <div>
+            <label>First Name:</label>
+            <input type="text" class="form-control" name="firstName" placeholder="First Name" required >
+      </div>
+
+      <div>
+            <label>Last Name:</label>
+            <input type="text" class="form-control" name="lastName" placeholder="Last Name" required >
+      </div>
+
+      
+      <div>
+      <label>Gender:</label>
+      <select name="gender" class="form-control" required>
+        <option value="">Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      </div>
+
+
+      <div>
+      <label>Date Of Birth:</label>
+      <input type="date" class="form-control" name="dob" required >
+      </div>
+
+      <div>
+      <label>Email:</label>
+      <input type="email" class="form-control" name="email" placeholder="Email" required >
+       </div>
+
+      <div>
+      <label>Password:</label>
+      <input type="password" class="form-control" name="password" placeholder="Password" required >
+      </div>
+
+
+      <div style="display: flex; align-items: center;">
+        <p>Image:</p>
+        <input type="file" name="file" required " />
+      </div>
+
+      <button type="submit" class="btn">
+        Register
+      </button>
+
+      <div class="hrf">
+        <br>
+        <p>Already have an account?<a href="./login.html" >Login</a></p>
+      </div>
+
+  </div>
+
+  </form>
+  </div>
+
+  <script>
+    document
+      .getElementById("registerForm")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const response = await fetch("http://localhost:3000/api/register", {
+          method: "POST",
+          body:formData
+          // headers: { "Content-Type": "application/json" },
+        });
+        // console.log(body);
+        const result = await response.json();
+        console.log(result);
+        if (result.message === "User registered") {
+          alert("Registration successful");
+          window.location.href = "./login.html";
+        } else {
+          alert("Error: " + result.message);
+        }
+      });
+  </script>
+</body>
+
+</html>

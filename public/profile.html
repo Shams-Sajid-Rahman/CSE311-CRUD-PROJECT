@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">Profile</h1>
+        <form id="profileForm">
+            <div style="display: flex; justify-content: center;">
+                <img src="" id="image" alt="profile picture" style="width: 200px; height: 200px; object-fit: cover; border-radius: 50%; border: 2px solid black; text-align: center;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 25px">
+                <label for="firstName" style="color: black; font-weight: bold">First Name:</label>
+                <input type="text" name="firstName" placeholder="First Name" disabled style="
+              width: 300px;
+              border: none;
+              background-color: transparent;
+              border-bottom: 2px solid gray;
+              font-size: 18px;
+              color: black;
+
+            " />
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 28px">
+                <label for="lastName" style="color: black; font-weight: bold">Last Name:</label>
+                <input type="text" name="lastName" placeholder="Last Name" disabled style="
+              width: 300px;
+              border: none;
+              background-color: transparent;
+              border-bottom: 2px solid gray;
+              font-size: 18px;
+              color: black;
+            " />
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 53px">
+                <label for="gender" style="color: black; font-weight: bold">Gender:</label>
+                <select name="gender" disabled style="
+              width: 300px;
+              border: none;
+              background-color: transparent;
+              border-bottom: 2px solid gray;
+              font-size: 18px;
+              color: black;
+            ">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px">
+                <label for="dob" style="color: black; font-weight: bold">Date Of Birth:</label>
+                <input type="date" name="dob" disabled style="
+              width: 300px;
+              border: none;
+              background-color: transparent;
+              border-bottom: 2px solid gray;
+              font-size: 18px;
+              color: black;
+            " />
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 65px">
+                <label for="email" style="color: black; font-weight: bold">Email:</label>
+                <input type="email" name="email" placeholder="Email" disabled style="
+              width: 300px;
+              border: none;
+              background-color: transparent;
+              border-bottom: 2px solid gray;
+              font-size: 18px;
+              color: black;
+            " />
+            </div>
+
+            <button type="button" id="editButton"
+                style="width: 120px; background-color: yellow; color: black; font-weight: bold; border-radius: 20px;">Edit</button>
+            <button type="submit" id="updateButton" class="hidden"
+                style="width: 100px; background-color: green; color: wheat; font-weight: bold; border-radius: 20px;">Update</button>
+        </form>
+        <div style="display: flex; justify-content: space-between; gap: 60px;">
+            <button id="deleteButton" style="background-color: red; color: wheat; font-weight: bold; border-radius: 20px;">Delete Account</button>
+            <button id="logoutButton" style="background-color: rgb(141, 24, 24); color: wheat; font-weight: bold; border-radius: 20px;">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Not authenticated");
+                window.location.href = "login.html";
+                return;
+            }
+
+            // Fetch profile data
+            const response = await fetch("http://localhost:3000/api/profile", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const user = await response.json();
+            console.log(user);
+            if (!user) {
+                alert("Error fetching profile");
+                return;
+            }
+            document.querySelector('[name="firstName"]').value = user.firstName;
+            document.querySelector('[name="lastName"]').value = user.lastName;
+            document.querySelector('[name="gender"]').value = user.gender;
+            document.querySelector('[name="dob"]').value = user.dob;
+            document.querySelector('[name="email"]').value = user.email;
+            document.getElementById('image').src = `../uploads/${user.profileImage}`;
+
+            // Edit button
+            document.getElementById("editButton").addEventListener("click", () => {
+                document
+                    .querySelectorAll("input, select")
+                    .forEach((input) => (input.disabled = false));
+                document.getElementById("editButton").classList.add("hidden");
+                document.getElementById("updateButton").classList.remove("hidden");
+            });
+
+            // Update button
+            document
+                .getElementById("profileForm")
+                .addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    const updateResponse = await fetch(
+                        "http://localhost:3000/api/profile",
+                        {
+                            method: "PUT",
+                            body: JSON.stringify(Object.fromEntries(formData)),
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${token}`,
+                            },
+                        }
+                    );
+                    const updateResult = await updateResponse.json();
+                    if (updateResult.message === "Profile updated") {
+                        alert("Profile updated");
+                        document
+                            .querySelectorAll("input, select")
+                            .forEach((input) => (input.disabled = true));
+                        document.getElementById("editButton").classList.remove("hidden");
+                        document.getElementById("updateButton").classList.add("hidden");
+                    } else {
+                        alert("Error: " + updateResult.message);
+                    }
+                });
+
+            // Delete button
+            document
+                .getElementById("deleteButton")
+                .addEventListener("click", async () => {
+                    if (confirm("Are you sure you want to delete your account?")) {
+                        const deleteResponse = await fetch(
+                            "http://localhost:3000/api/profile",
+                            {
+                                method: "DELETE",
+                                headers: { Authorization: `Bearer ${token}` },
+                            }
+                        );
+                        const deleteResult = await deleteResponse.json();
+                        if (deleteResult.message === "Account deleted") {
+                            alert("Account deleted");
+                            localStorage.removeItem("token");
+                            window.location.href = "register.html";
+                        } else {
+                            alert("Error: " + deleteResult.message);
+                        }
+                    }
+                });
+
+            // Logout button
+            document
+                .getElementById("logoutButton")
+                .addEventListener("click", () => {
+                    localStorage.removeItem("token");
+                    window.location.href = "login.html";
+                });
+        });
+    </script>
+</body>
+
+</html>
